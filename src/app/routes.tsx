@@ -9,7 +9,8 @@ import { InventoryPage } from "./pages/InventoryPage";
 import { ReportsPage } from "./pages/ReportsPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { LoginPage } from "./pages/LoginPage";
-import { AuthGuard } from "./components/AuthGuard";
+import { AuthGuard, HomeRedirect, RoleGuard } from "./components/AuthGuard";
+import { BorrowHistoryPage } from "./pages/BorrowPage";
 
 export const router = createBrowserRouter([
   {
@@ -24,14 +25,79 @@ export const router = createBrowserRouter([
       </AuthGuard>
     ),
     children: [
-      { index: true, Component: DashboardPage },
-      { path: "equipment", Component: EquipmentPage },
-      { path: "categories", Component: CategoriesPage },
-      { path: "borrow", Component: BorrowPage },
-      { path: "maintenance", Component: MaintenancePage },
-      { path: "inventory", Component: InventoryPage },
-      { path: "reports", Component: ReportsPage },
-      { path: "settings", Component: SettingsPage },
+      { index: true, Component: HomeRedirect },
+      {
+        path: "equipment",
+        Component: () => (
+          <RoleGuard path="/equipment">
+            <EquipmentPage />
+          </RoleGuard>
+        ),
+      },
+      {
+        path: "categories",
+        Component: () => (
+          <RoleGuard path="/categories">
+            <CategoriesPage />
+          </RoleGuard>
+        ),
+      },
+      {
+        path: "borrow",
+        Component: () => (
+          <RoleGuard path="/borrow">
+            <BorrowPage />
+          </RoleGuard>
+        ),
+      },
+      {
+        path: "borrow/history",
+        Component: () => (
+          <RoleGuard path="/borrow/history">
+            <BorrowHistoryPage />
+          </RoleGuard>
+        ),
+      },
+      {
+        path: "maintenance",
+        Component: () => (
+          <RoleGuard path="/maintenance">
+            <MaintenancePage />
+          </RoleGuard>
+        ),
+      },
+      {
+        path: "inventory",
+        Component: () => (
+          <RoleGuard path="/inventory">
+            <InventoryPage />
+          </RoleGuard>
+        ),
+      },
+      {
+        path: "reports",
+        Component: () => (
+          <RoleGuard path="/reports">
+            <ReportsPage />
+          </RoleGuard>
+        ),
+      },
+      {
+        path: "settings",
+        Component: () => (
+          <RoleGuard path="/settings">
+            <SettingsPage />
+          </RoleGuard>
+        ),
+      },
+      {
+        path: "dashboard",
+        Component: () => (
+          <RoleGuard path="/dashboard">
+            <DashboardPage />
+          </RoleGuard>
+        ),
+      },
     ],
   },
 ]);

@@ -2,8 +2,10 @@ import { Router } from 'express';
 import { Equipment } from '../models/Equipment.js';
 import { BorrowRequest } from '../models/BorrowRequest.js';
 import { MaintenanceRecord } from '../models/MaintenanceRecord.js';
+import { authorize, NON_LECTURER_ROLES } from '../middleware/auth.js';
 
 const router = Router();
+router.use(authorize(...NON_LECTURER_ROLES));
 
 // GET /api/stats/overview
 router.get('/overview', async (_req, res) => {

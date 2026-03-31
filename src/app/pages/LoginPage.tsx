@@ -1,13 +1,19 @@
 import { useState } from "react";
+import { Navigate } from "react-router";
 import { GraduationCap, Loader2 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { getDefaultRouteForRole } from "../access-control";
 
 export function LoginPage() {
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  if (user) {
+    return <Navigate to={getDefaultRouteForRole(user.role)} replace />;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

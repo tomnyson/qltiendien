@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import jwt from 'jsonwebtoken';
+import type { SignOptions } from 'jsonwebtoken';
 import { User } from '../models/User.js';
 import { authenticate, type AuthRequest } from '../middleware/auth.js';
 
@@ -27,11 +28,14 @@ router.post('/login', async (req, res) => {
     // Update last login
     user.lastLogin = new Date();
     await user.save();
+    const jwtOptions: SignOptions = {
+      expiresIn: (process.env.JWT_EXPIRES_IN || '7d') as SignOptions['expiresIn'],
+    };
 
     const token = jwt.sign(
       { id: user._id },
       process.env.JWT_SECRET || 'dev-secret',
-      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+      jwtOptions
     );
 
     res.json({

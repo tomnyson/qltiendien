@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { Equipment } from '../models/Equipment.js';
+import { authorize, NON_LECTURER_ROLES } from '../middleware/auth.js';
 
 const router = Router();
 
@@ -52,7 +53,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST /api/equipment
-router.post('/', async (req, res) => {
+router.post('/', authorize(...NON_LECTURER_ROLES), async (req, res) => {
   try {
     const equipment = await Equipment.create(req.body);
     const populated = await equipment.populate(['category', 'location', 'supplier']);
@@ -66,7 +67,7 @@ router.post('/', async (req, res) => {
 });
 
 // PUT /api/equipment/:id
-router.put('/:id', async (req, res) => {
+router.put('/:id', authorize(...NON_LECTURER_ROLES), async (req, res) => {
   try {
     const equipment = await Equipment.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
@@ -80,7 +81,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE /api/equipment/:id
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authorize(...NON_LECTURER_ROLES), async (req, res) => {
   try {
     const equipment = await Equipment.findByIdAndDelete(req.params.id);
     if (!equipment) return res.status(404).json({ message: 'Không tìm thấy thiết bị' });

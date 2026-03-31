@@ -2,6 +2,9 @@ import type { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/User.js';
 
+export type UserRole = 'admin' | 'warehouse' | 'lecturer' | 'director';
+export const NON_LECTURER_ROLES: UserRole[] = ['admin', 'warehouse', 'director'];
+
 export interface AuthRequest extends Request {
   user?: any;
 }

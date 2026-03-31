@@ -1,8 +1,10 @@
 import { Router } from 'express';
 import { Location } from '../models/Location.js';
 import { Equipment } from '../models/Equipment.js';
+import { authorize, NON_LECTURER_ROLES } from '../middleware/auth.js';
 
 const router = Router();
+router.use(authorize(...NON_LECTURER_ROLES));
 
 // GET /api/locations - with equipment count
 router.get('/', async (_req, res) => {

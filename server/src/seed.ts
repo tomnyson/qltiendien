@@ -95,20 +95,83 @@ async function seed() {
     { name: 'Máy quay phim Sony PXW-Z90', code: 'MQ-001', category: catMap.get('Thiết bị truyền thông'), location: getLocationId('Studio'), status: 'available' as const, supplier: supMap.get('Sony Vietnam'), purchaseDate: new Date('2024-04-10'), value: 55000000 },
   ];
   const equipment = await Equipment.insertMany(equipmentData);
+  const equipmentMap = new Map(equipment.map((item) => [item.code, item]));
   console.log(`✅ Created ${equipment.length} equipment items`);
 
-  // 5. Borrow Requests
+  // 5. Users (password: 123456)
+  const usersData = [
+    { name: 'Nguyễn Admin', email: 'admin@school.edu.vn', password: '123456', role: 'admin' as const, department: 'Phòng CNTT' },
+    { name: 'Trần Thủ Kho', email: 'thukho@school.edu.vn', password: '123456', role: 'warehouse' as const, department: 'Phòng Quản trị' },
+    { name: 'Lê Giảng Viên', email: 'giangvien@school.edu.vn', password: '123456', role: 'lecturer' as const, department: 'Khoa CNTT' },
+    { name: 'Phạm Hiệu Trưởng', email: 'hieutruong@school.edu.vn', password: '123456', role: 'director' as const, department: 'Ban Giám hiệu' },
+  ];
+
+  const users = [];
+  for (const userData of usersData) {
+    users.push(await User.create(userData));
+  }
+  const userMap = new Map(users.map((user) => [user.email, user]));
+  console.log(`✅ Created ${users.length} users (password: 123456)`);
+
+  // 6. Borrow Requests
+  const lecturer = userMap.get('giangvien@school.edu.vn');
   const borrowsData = [
-    { equipmentName: 'Máy chiếu Epson EB-X51', equipmentCode: 'MC-001', borrower: 'Nguyễn Văn A', borrowDate: new Date('2026-03-25'), returnDate: new Date('2026-03-28'), status: 'approved' as const },
-    { equipmentName: 'Laptop Dell Latitude 5540', equipmentCode: 'LT-012', borrower: 'Trần Thị B', borrowDate: new Date('2026-03-20'), returnDate: new Date('2026-04-03'), status: 'pending' as const },
-    { equipmentName: 'Camera hội nghị Logitech Rally', equipmentCode: 'CM-003', borrower: 'Lê Văn C', borrowDate: new Date('2026-03-18'), returnDate: new Date('2026-03-22'), status: 'overdue' as const },
-    { equipmentName: 'Bộ thí nghiệm Vật lý cơ bản', equipmentCode: 'TN-101', borrower: 'Phạm Thị D', borrowDate: new Date('2026-03-26'), returnDate: new Date('2026-03-30'), status: 'pending' as const },
-    { equipmentName: 'Máy quay phim Sony PXW-Z90', equipmentCode: 'MQ-001', borrower: 'Hoàng Văn E', borrowDate: new Date('2026-03-15'), returnDate: new Date('2026-03-20'), status: 'returned' as const },
+    {
+      equipment: equipmentMap.get('MC-001')?._id,
+      equipmentName: 'Máy chiếu Epson EB-X51',
+      equipmentCode: 'MC-001',
+      borrower: 'Nguyễn Văn A',
+      createdBy: userMap.get('admin@school.edu.vn')?._id,
+      borrowDate: new Date('2026-03-25'),
+      returnDate: new Date('2026-03-28'),
+      status: 'approved' as const,
+    },
+    {
+      equipment: equipmentMap.get('LT-012')?._id,
+      equipmentName: 'Laptop Dell Latitude 5540',
+      equipmentCode: 'LT-012',
+      borrower: 'Trần Thị B',
+      createdBy: userMap.get('thukho@school.edu.vn')?._id,
+      borrowDate: new Date('2026-03-20'),
+      returnDate: new Date('2026-04-03'),
+      status: 'pending' as const,
+    },
+    {
+      equipment: equipmentMap.get('CM-003')?._id,
+      equipmentName: 'Camera hội nghị Logitech Rally',
+      equipmentCode: 'CM-003',
+      borrower: 'Lê Văn C',
+      createdBy: userMap.get('admin@school.edu.vn')?._id,
+      borrowDate: new Date('2026-03-18'),
+      returnDate: new Date('2026-03-22'),
+      status: 'overdue' as const,
+    },
+    {
+      equipment: equipmentMap.get('TN-101')?._id,
+      equipmentName: 'Bộ thí nghiệm Vật lý cơ bản',
+      equipmentCode: 'TN-101',
+      borrower: lecturer?.name || 'Lê Giảng Viên',
+      createdBy: lecturer?._id,
+      borrowDate: new Date('2026-03-26'),
+      returnDate: new Date('2026-04-02'),
+      status: 'pending' as const,
+    },
+    {
+      equipment: equipmentMap.get('MQ-001')?._id,
+      equipmentName: 'Máy quay phim Sony PXW-Z90',
+      equipmentCode: 'MQ-001',
+      borrower: lecturer?.name || 'Lê Giảng Viên',
+      createdBy: lecturer?._id,
+      borrowDate: new Date('2026-03-15'),
+      returnDate: new Date('2026-03-20'),
+      status: 'returned' as const,
+      actualReturnDate: new Date('2026-03-20'),
+    },
   ];
   await BorrowRequest.insertMany(borrowsData);
   console.log(`✅ Created ${borrowsData.length} borrow requests`);
 
-  // 6. Maintenance Records
+  // 7. Maintenance Records
   const maintenanceData = [
     { equipmentName: 'Máy in HP LaserJet Pro M404dn', equipmentCode: 'MI-005', type: 'repair' as const, date: new Date('2026-03-20'), cost: 1500000, status: 'in-progress' as const, technician: 'Nguyễn Kỹ Thuật' },
     { equipmentName: 'Máy chiếu Epson EB-X51', equipmentCode: 'MC-001', type: 'inspection' as const, date: new Date('2026-04-01'), cost: 500000, status: 'scheduled' as const, technician: 'Trần Bảo Trì' },
@@ -117,7 +180,7 @@ async function seed() {
   await MaintenanceRecord.insertMany(maintenanceData);
   console.log(`✅ Created ${maintenanceData.length} maintenance records`);
 
-  // 7. Disposal Requests
+  // 8. Disposal Requests
   const disposalData = [
     { equipmentName: 'Máy đo nhiệt độ hồng ngoại', equipmentCode: 'MD-007', reason: 'Hết tuổi thọ sử dụng', originalValue: 12000000, residualValue: 500000, status: 'pending' as const },
     { equipmentName: 'Máy chiếu cũ Panasonic', equipmentCode: 'MC-OLD', reason: 'Hư hỏng không sửa được', originalValue: 8000000, residualValue: 0, status: 'approved' as const },
@@ -125,7 +188,7 @@ async function seed() {
   await DisposalRequest.insertMany(disposalData);
   console.log(`✅ Created ${disposalData.length} disposal requests`);
 
-  // 8. Inventory Sessions
+  // 9. Inventory Sessions
   const inventoryData = [
     { name: 'Kiểm kê Quý 1/2026', date: new Date('2026-03-15'), location: 'Toàn trường', totalItems: 440, checkedItems: 380, matchedItems: 365, mismatchedItems: 15, status: 'in-progress' as const, progress: 86 },
     { name: 'Kiểm kê Quý 4/2025', date: new Date('2025-12-20'), location: 'Toàn trường', totalItems: 430, checkedItems: 430, matchedItems: 425, mismatchedItems: 5, status: 'completed' as const, progress: 100 },
@@ -133,19 +196,6 @@ async function seed() {
   ];
   await InventorySession.insertMany(inventoryData);
   console.log(`✅ Created ${inventoryData.length} inventory sessions`);
-
-  // 9. Users (password: 123456)
-  const usersData = [
-    { name: 'Nguyễn Admin', email: 'admin@school.edu.vn', password: '123456', role: 'admin' as const, department: 'Phòng CNTT' },
-    { name: 'Trần Thủ Kho', email: 'thukho@school.edu.vn', password: '123456', role: 'warehouse' as const, department: 'Phòng Quản trị' },
-    { name: 'Lê Giảng Viên', email: 'giangvien@school.edu.vn', password: '123456', role: 'lecturer' as const, department: 'Khoa CNTT' },
-    { name: 'Phạm Hiệu Trưởng', email: 'hieutruong@school.edu.vn', password: '123456', role: 'director' as const, department: 'Ban Giám hiệu' },
-  ];
-
-  for (const userData of usersData) {
-    await User.create(userData);
-  }
-  console.log(`✅ Created ${usersData.length} users (password: 123456)`);
 
   // 10. Audit Logs
   const auditData = [

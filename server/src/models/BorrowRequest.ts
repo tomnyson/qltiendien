@@ -5,6 +5,7 @@ export interface IBorrowRequest extends Document {
   equipmentName: string;
   equipmentCode: string;
   borrower: string;
+  createdBy?: Types.ObjectId;
   borrowDate: Date;
   returnDate: Date;
   actualReturnDate?: Date;
@@ -20,6 +21,7 @@ const borrowRequestSchema = new Schema<IBorrowRequest>({
   equipmentName: { type: String, required: true },
   equipmentCode: { type: String, required: true },
   borrower: { type: String, required: true },
+  createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
   borrowDate: { type: Date, required: true },
   returnDate: { type: Date, required: true },
   actualReturnDate: Date,

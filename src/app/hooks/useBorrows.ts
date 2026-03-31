@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '../services/api';
 
-export function useBorrows(filters?: { status?: string; search?: string }) {
+export function useBorrows(filters?: { status?: string; search?: string; scope?: 'active' | 'history' | 'all' }) {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -13,6 +13,7 @@ export function useBorrows(filters?: { status?: string; search?: string }) {
       const params = new URLSearchParams();
       if (filters?.status && filters.status !== 'all') params.set('status', filters.status);
       if (filters?.search) params.set('search', filters.search);
+      if (filters?.scope && filters.scope !== 'all') params.set('scope', filters.scope);
       const qs = params.toString();
       const res = await api.get<any[]>(`/borrows${qs ? `?${qs}` : ''}`);
       setData(res);
@@ -21,7 +22,7 @@ export function useBorrows(filters?: { status?: string; search?: string }) {
     } finally {
       setLoading(false);
     }
-  }, [filters?.status, filters?.search]);
+  }, [filters?.scope, filters?.status, filters?.search]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 

@@ -1,11 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '../services/api';
 
-export function useCategories() {
+export function useCategories(enabled: boolean = true) {
   const [data, setData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(enabled);
 
   const fetchData = useCallback(async () => {
+    if (!enabled) {
+      setData([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       const res = await api.get<any[]>('/categories');
@@ -13,7 +18,7 @@ export function useCategories() {
     } catch { /* silent */ } finally {
       setLoading(false);
     }
-  }, []);
+  }, [enabled]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -24,11 +29,16 @@ export function useCategories() {
   return { data, loading, refetch: fetchData, create, update, remove };
 }
 
-export function useLocations() {
+export function useLocations(enabled: boolean = true) {
   const [data, setData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(enabled);
 
   const fetchData = useCallback(async () => {
+    if (!enabled) {
+      setData([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       const res = await api.get<any[]>('/locations');
@@ -36,7 +46,7 @@ export function useLocations() {
     } catch { /* silent */ } finally {
       setLoading(false);
     }
-  }, []);
+  }, [enabled]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -47,11 +57,16 @@ export function useLocations() {
   return { data, loading, refetch: fetchData, create, update, remove };
 }
 
-export function useSuppliers() {
+export function useSuppliers(enabled: boolean = true) {
   const [data, setData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(enabled);
 
   const fetchData = useCallback(async () => {
+    if (!enabled) {
+      setData([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       const res = await api.get<any[]>('/suppliers');
@@ -59,7 +74,7 @@ export function useSuppliers() {
     } catch { /* silent */ } finally {
       setLoading(false);
     }
-  }, []);
+  }, [enabled]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 

@@ -2,8 +2,10 @@ import { Router } from 'express';
 import { MaintenanceRecord } from '../models/MaintenanceRecord.js';
 import { DisposalRequest } from '../models/DisposalRequest.js';
 import { Equipment } from '../models/Equipment.js';
+import { authorize, NON_LECTURER_ROLES } from '../middleware/auth.js';
 
 const router = Router();
+router.use(authorize(...NON_LECTURER_ROLES));
 
 // ==================== MAINTENANCE ====================
 

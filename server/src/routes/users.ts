@@ -1,8 +1,10 @@
 import { Router } from 'express';
 import { User } from '../models/User.js';
 import { AuditLog } from '../models/AuditLog.js';
+import { authorize, NON_LECTURER_ROLES } from '../middleware/auth.js';
 
 const router = Router();
+router.use(authorize(...NON_LECTURER_ROLES));
 
 // GET /api/users
 router.get('/', async (_req, res) => {

@@ -4,42 +4,51 @@ import {
   BarChart3, Settings, FolderTree, ChevronDown, ChevronRight, GraduationCap
 } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 
 const navGroups = [
   {
     label: "Tổng quan",
     items: [
-      { to: "/", icon: LayoutDashboard, label: "Dashboard" },
+      { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard", allowedRoles: ["admin", "warehouse", "director"] },
     ],
   },
   {
     label: "Quản lý",
     items: [
-      { to: "/equipment", icon: Package, label: "Thiết bị" },
-      { to: "/categories", icon: FolderTree, label: "Danh mục" },
-      { to: "/borrow", icon: ArrowLeftRight, label: "Mượn - Trả" },
-      { to: "/maintenance", icon: Wrench, label: "Bảo trì & Thanh lý" },
-      { to: "/inventory", icon: ClipboardCheck, label: "Kiểm kê" },
+      { to: "/equipment", icon: Package, label: "Thiết bị", lecturerLabel: "Thiết bị đang trống" },
+      { to: "/categories", icon: FolderTree, label: "Danh mục", allowedRoles: ["admin", "warehouse", "director"] },
+      { to: "/borrow", icon: ArrowLeftRight, label: "Mượn - Trả", lecturerLabel: "Phiếu mượn" },
+      { to: "/borrow/history", icon: ArrowLeftRight, label: "Lịch sử mượn", allowedRoles: ["lecturer"] },
+      { to: "/maintenance", icon: Wrench, label: "Bảo trì & Thanh lý", allowedRoles: ["admin", "warehouse", "director"] },
+      { to: "/inventory", icon: ClipboardCheck, label: "Kiểm kê", allowedRoles: ["admin", "warehouse", "director"] },
     ],
   },
   {
     label: "Báo cáo",
     items: [
-      { to: "/reports", icon: BarChart3, label: "Thống kê" },
+      { to: "/reports", icon: BarChart3, label: "Thống kê", allowedRoles: ["admin", "warehouse", "director"] },
     ],
   },
   {
     label: "Hệ thống",
     items: [
-      { to: "/settings", icon: Settings, label: "Cài đặt & Phân quyền" },
+      { to: "/settings", icon: Settings, label: "Cài đặt & Phân quyền", allowedRoles: ["admin", "warehouse", "director"] },
     ],
   },
 ];
 
 export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
+  const { user } = useAuth();
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
     Object.fromEntries(navGroups.map((g) => [g.label, true]))
   );
+  const availableGroups = navGroups
+    .map((group) => ({
+      ...group,
+      items: group.items.filter((item) => !item.allowedRoles || item.allowedRoles.includes(user?.role || "")),
+    }))
+    .filter((group) => group.items.length > 0);
 
   const toggleGroup = (label: string) => {
     setExpandedGroups((prev) => ({ ...prev, [label]: !prev[label] }));
@@ -66,7 +75,7 @@ export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle:
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-2 px-2">
-        {navGroups.map((group) => (
+        {availableGroups.map((group) => (
           <div key={group.label} className="mb-1">
             {!collapsed && (
               <button
@@ -86,7 +95,7 @@ export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle:
                 <NavLink
                   key={item.to}
                   to={item.to}
-                  end={item.to === "/"}
+                  end
                   className={({ isActive }) =>
                     `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
                       isActive
@@ -96,7 +105,7 @@ export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle:
                   }
                 >
                   <item.icon className="w-4.5 h-4.5 shrink-0" />
-                  {!collapsed && <span>{item.label}</span>}
+                  {!collapsed && <span>{user?.role === "lecturer" && item.lecturerLabel ? item.lecturerLabel : item.label}</span>}
                 </NavLink>
               ))}
           </div>

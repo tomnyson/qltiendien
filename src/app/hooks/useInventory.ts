@@ -41,8 +41,8 @@ export function useInventory() {
     return res;
   };
 
-  const checkItem = async (sessionId: string, equipmentId: string, matched: boolean = true) => {
-    const res = await api.patch<InventorySession>(`/inventory/${sessionId}/check`, { equipmentId, matched });
+  const checkItem = async (sessionId: string, scanValue: string, matched: boolean = true) => {
+    const res = await api.patch<InventorySession>(`/inventory/${sessionId}/check`, { scanValue, matched });
     setSessions(prev => prev.map(s => s._id === sessionId ? res : s));
     return res;
   };

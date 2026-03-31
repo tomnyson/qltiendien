@@ -1,8 +1,10 @@
 import { Router } from 'express';
 import { Supplier } from '../models/Supplier.js';
 import { Equipment } from '../models/Equipment.js';
+import { authorize, NON_LECTURER_ROLES } from '../middleware/auth.js';
 
 const router = Router();
+router.use(authorize(...NON_LECTURER_ROLES));
 
 // GET /api/suppliers - with item count
 router.get('/', async (_req, res) => {

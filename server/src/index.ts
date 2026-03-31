@@ -14,6 +14,7 @@ import maintenanceRoutes from './routes/maintenance.js';
 import inventoryRoutes from './routes/inventory.js';
 import statsRoutes from './routes/stats.js';
 import usersRoutes from './routes/users.js';
+import { authenticate } from './middleware/auth.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -24,15 +25,15 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/equipment', equipmentRoutes);
-app.use('/api/categories', categoriesRoutes);
-app.use('/api/locations', locationsRoutes);
-app.use('/api/suppliers', suppliersRoutes);
-app.use('/api/borrows', borrowsRoutes);
-app.use('/api/maintenance', maintenanceRoutes);
-app.use('/api/inventory', inventoryRoutes);
-app.use('/api/stats', statsRoutes);
-app.use('/api/users', usersRoutes);
+app.use('/api/equipment', authenticate, equipmentRoutes);
+app.use('/api/categories', authenticate, categoriesRoutes);
+app.use('/api/locations', authenticate, locationsRoutes);
+app.use('/api/suppliers', authenticate, suppliersRoutes);
+app.use('/api/borrows', authenticate, borrowsRoutes);
+app.use('/api/maintenance', authenticate, maintenanceRoutes);
+app.use('/api/inventory', authenticate, inventoryRoutes);
+app.use('/api/stats', authenticate, statsRoutes);
+app.use('/api/users', authenticate, usersRoutes);
 
 // Health check
 app.get('/api/health', (_req, res) => {
